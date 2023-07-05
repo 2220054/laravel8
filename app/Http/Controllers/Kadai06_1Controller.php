@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class Kadai06_1Controller extends Controller
 {
@@ -30,6 +31,7 @@ class Kadai06_1Controller extends Controller
     public function create()
     {
         //
+        return view("kadai08_1");
     }
 
     /**
@@ -41,6 +43,18 @@ class Kadai06_1Controller extends Controller
     public function store(Request $request)
     {
         //
+        $request->session()->regenerateToken();
+        $articleDao = new Article();
+        $articleDao->title = $request->input( "title" );
+        $articleDao->body = $request->input( "body" );
+        $this->validate( $request, $articleDao::$rules, $articleDao::$messages );
+
+        DB::transaction(function() use( $articleDao ){
+            $articleDao->save();
+        });
+
+        return redirect()->route( "kadai06_1.index" );
+
     }
 
     /**

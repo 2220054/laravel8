@@ -68,5 +68,3 @@ Route::post('kadai05_1', [kadai05Controller::class, 'post']);
 Route::resource( 'kadai06_1', kadai06_1Controller::class );
 
 
-
-
