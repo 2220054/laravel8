@@ -16,10 +16,10 @@ class Kadai06_1Controller extends Controller
     public function index()
     {
         // $articles = Article::get();
-         $articles = Article::orderBy('created_at', 'desc')->paginate(10);
+        $articles = Article::orderBy('created_at', 'desc')->paginate(10);
 
 
-        return view(" kadai06_1 " , compact( "articles" ));
+        return view(" kadai06_1 ", compact("articles"));
 
     }
 
@@ -45,15 +45,15 @@ class Kadai06_1Controller extends Controller
         //
         $request->session()->regenerateToken();
         $articleDao = new Article();
-        $articleDao->title = $request->input( "title" );
-        $articleDao->body = $request->input( "body" );
-        $this->validate( $request, $articleDao::$rules, $articleDao::$messages );
+        $articleDao->title = $request->input("title");
+        $articleDao->body = $request->input("body");
+        $this->validate($request, $articleDao::$rules, $articleDao::$messages);
 
-        DB::transaction(function() use( $articleDao ){
+        DB::transaction(function () use ($articleDao) {
             $articleDao->save();
         });
 
-        return redirect()->route( "kadai06_1.index" );
+        return redirect()->route("kadai06_1.index");
 
     }
 
@@ -66,8 +66,8 @@ class Kadai06_1Controller extends Controller
     public function show($id)
     {
         //
-        $article = Article::find( $id );
-        return view(" kadai07_1 " , compact( "article" ));
+        $article = Article::find($id);
+        return view(" kadai07_1 ", compact("article"));
     }
 
     /**
@@ -79,6 +79,8 @@ class Kadai06_1Controller extends Controller
     public function edit($id)
     {
         //
+        $article = Article::find($id);
+        return view("kadai09_1", compact("article"));
     }
 
     /**
@@ -91,6 +93,18 @@ class Kadai06_1Controller extends Controller
     public function update(Request $request, $id)
     {
         //
+        $request->session()->regenerateToken();
+        $articleDao = new Article();
+        $this->validate($request, $articleDao::$rules, $articleDao::$messages);
+
+        DB::transaction(function () use ($articleDao, $request, $id) {
+            $article = $articleDao->find($id);
+            $article->title = $request->input("title");
+            $article->body = $request->input("body");
+
+            $article->save();
+        });
+        return redirect()->route("kadai06_1.show", $id);
     }
 
     /**
@@ -102,5 +116,12 @@ class Kadai06_1Controller extends Controller
     public function destroy($id)
     {
         //
+        $articleDao = new Article();
+        DB::transaction(function () use ($articleDao, $id) {
+            $articleDao->destroy($id);
+        });
+        return redirect()->route("kadai06_1.index");
+
+
     }
 }

@@ -16,10 +16,10 @@
                 <p class="my-2 text-red-500">{{ $message }}</p>
             @enderror
         </div>
-        <div class="flex justify-between py-3">
+        <div class="my-5 px-5 py-2 border-b">
             <div class="grow">
                 <label class="block text-gray-500 text-sm uppercase" for="body">body</label>
-                <textarea name="body" class="w-full h-80 px-3 py-2 resize-none"></textarea>
+                <textarea name="body" class="w-full h-80 px-3 py-2 resize-none" style="height: 160px;"></textarea>
                 @error('body')
                     <p class="my-2 text-red-500">{{ $message }}</p>
                 @enderror
