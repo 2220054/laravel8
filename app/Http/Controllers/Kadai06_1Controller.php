@@ -115,11 +115,12 @@ class Kadai06_1Controller extends Controller
     {
         //
         $request->session()->regenerateToken();
+
         $articleDao = new Article();
         $this->validate($request, $articleDao::$rules, $articleDao::$messages);
-
         $thumbnailDao = new Thumbnail();
         $this->validate($request, $thumbnailDao::$rules, $thumbnailDao::$messages);
+
         $image = null;
         if($request->has("image")){
             $file = $request->file("image");
@@ -129,8 +130,8 @@ class Kadai06_1Controller extends Controller
 
         DB::transaction(function () use ($articleDao, $request, $id,$thumbnailDao,$image) {
             $article = $articleDao->find($id);
-            $article->title = $request->input("title");
-            $article->body = $request->input("body");
+            $article->title = $request->title;
+            $article->body = $request->body;
             $article->save();
 
             if($image){
