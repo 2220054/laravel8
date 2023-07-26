@@ -6,7 +6,7 @@
 @section('content')
 
 <section>
-<form action="{{route('kadai06_1.update', $article->id )}}" method="POST">
+<form action="{{route('kadai06_1.update', $article->id )}}" method="POST" enctype="multipart/form-data">
     @csrf
     @method( "PUT" )
     <div class="bg-white hover:bg-white p-5 mb-10 rounded-md shadow-md">
@@ -16,6 +16,13 @@
         </div>
         <div class="my-5 px-5 py-2 border-b">
             <div class="grow">
+                <div class="w-4/12 mr-5">
+                    <label class="block text-gray-500 text-sm uppercase" for="image">image file</label>
+                    <input type="file" name="image" id="image" class="w-full h-80 text-xs px-3 py-2 border border-gray-300 rounded-md" value="{{old('image')}}">
+                    @error('image')
+                        <p class="my-2 text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
                 <label class="block text-gray-500 text-sm uppercase" for="body">body</label>
                 <textarea name="body" class="w-full h-80 px-3 py-2 resize-none" style="height: 168px;">{{$article->body}}</textarea>
             </div>

@@ -26,6 +26,10 @@ class Article extends Model
         "body.required" => "本文が⼊⼒されていません",
     ];
 
+    public function thumbnails() {
+        return $this->hasMany( Thumbnail::class );
+    }
+
 
 
 }

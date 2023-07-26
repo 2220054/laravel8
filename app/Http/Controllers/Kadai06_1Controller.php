@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+// use Illuminate\Support\Facades\Storage;
+//課題10
+use App\Models\Thumbnail;
+use Storage;
 
 class Kadai06_1Controller extends Controller
 {
@@ -45,12 +50,28 @@ class Kadai06_1Controller extends Controller
         //
         $request->session()->regenerateToken();
         $articleDao = new Article();
-        $articleDao->title = $request->input("title");
-        $articleDao->body = $request->input("body");
         $this->validate($request, $articleDao::$rules, $articleDao::$messages);
 
-        DB::transaction(function () use ($articleDao) {
+        $thumbnailDao = new Thumbnail();
+        $this->validate($request, $thumbnailDao::$rules, $thumbnailDao::$messages);
+
+        $articleDao->title = $request->input("title");
+        $articleDao->body = $request->input("body");
+
+        $image = null;
+        if($request->has("image")){
+            $file = $request->file("image");
+            $image = Storage::disk("public")->put("images",$file);
+            $thumbnailDao->name = basename($image);
+        }
+
+        DB::transaction(function () use ($articleDao, $thumbnailDao, $image) {
             $articleDao->save();
+
+            if($image){
+                $thumbnailDao->article_id = $articleDao->id;
+                $thumbnailDao->save();
+            }
         });
 
         return redirect()->route("kadai06_1.index");
@@ -97,12 +118,26 @@ class Kadai06_1Controller extends Controller
         $articleDao = new Article();
         $this->validate($request, $articleDao::$rules, $articleDao::$messages);
 
-        DB::transaction(function () use ($articleDao, $request, $id) {
+        $thumbnailDao = new Thumbnail();
+        $this->validate($request, $thumbnailDao::$rules, $thumbnailDao::$messages);
+        $image = null;
+        if($request->has("image")){
+            $file = $request->file("image");
+            $image = Storage::disk("public")->put("images",$file);
+            $thumbnailDao->name = basename($image);
+        }
+
+        DB::transaction(function () use ($articleDao, $request, $id,$thumbnailDao,$image) {
             $article = $articleDao->find($id);
             $article->title = $request->input("title");
             $article->body = $request->input("body");
-
             $article->save();
+
+            if($image){
+                $thumbnailDao->article_id = $article->id;
+                $thumbnailDao->save();
+            }
+
         });
         return redirect()->route("kadai06_1.show", $id);
     }
@@ -117,11 +152,19 @@ class Kadai06_1Controller extends Controller
     {
         //
         $articleDao = new Article();
-        DB::transaction(function () use ($articleDao, $id) {
+        $thumbnailDao = new Thumbnail();
+
+        $thumbnails = $thumbnailDao->where("article_id", $id)->get();
+        $thumbnailIds = [];
+
+        foreach($thumbnails as $thumbnail){
+            $thumbnailIds[] = $thumbnail->id;
+        }
+
+        DB::transaction(function () use ($articleDao,$thumbnailDao, $id,$thumbnailIds) {
             $articleDao->destroy($id);
+            $thumbnailDao->destroy($thumbnailIds);
         });
         return redirect()->route("kadai06_1.index");
-
-
     }
 }

@@ -13,6 +13,13 @@
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-10">
             <article class="bg-white hover:bg-white rounded-md shadow-md hover:shadow-lg transition-shadow">
                 <a href="{{route("kadai06_1.show", $article->id)}}" class="block w-full h-full">
+                    <figure class="h-48 overflow-hidden">
+                        @foreach ($article ->thumbnails as $thumbnail)
+                            @if($loop->first)
+                            <img src="{{asset("storage/images/{$thumbnail->name}")}}" class="w-full h-full object-cover object-top">
+                            @endif
+                        @endforeach
+                    </figure>
                     <h3>{{$article->title}}</h3>
                     <p> <time datatime ="{{$article->created_at}}">{{$article->created_at}}</time></p>
                 </a>
